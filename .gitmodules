@@ -1,3 +1,6 @@
 [submodule "lib/cuda-samples"]
 	path = lib/cuda-samples
 	url = https://github.com/NVIDIA/cuda-samples.git
+[submodule "lib/argparse"]
+	path = lib/argparse
+	url = git@github.com:p-ranav/argparse.git

@@ -75,6 +75,18 @@
         "__nullptr": "cpp",
         "bitset": "cpp",
         "codecvt": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "barrier": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "source_location": "cpp",
+        "typeindex": "cpp",
+        "ranges": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "ios": "cpp"
     }
 }
