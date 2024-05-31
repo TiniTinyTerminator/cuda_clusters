@@ -14,11 +14,11 @@ Images are often contaminated with noise, which can lead to false edge detection
 
 The Gaussian filter is a low-pass filter that smooths the image by reducing the intensity variations between neighboring pixels. The 2D Gaussian filter is represented by the following equation:
 
-\[ G(x, y) = \frac{1}{2\pi\sigma^2} e^{-\frac{x^2 + y^2}{2\sigma^2}} \]
+$$ G(x, y) = \frac{1}{2\pi\sigma^2} e^{-\frac{x^2 + y^2}{2\sigma^2}} $$
 
-For instance, a \(5 \times 5\) Gaussian kernel with \(\sigma = 1\) can be represented as:
+For instance, a $5 \times 5$ Gaussian kernel with $\sigma = 1$ can be represented as:
 
-\[
+$$
 \begin{bmatrix}
 1 & 4 & 7 & 4 & 1 \\
 4 & 16 & 26 & 16 & 4 \\
@@ -26,11 +26,11 @@ For instance, a \(5 \times 5\) Gaussian kernel with \(\sigma = 1\) can be repres
 4 & 16 & 26 & 16 & 4 \\
 1 & 4 & 7 & 4 & 1
 \end{bmatrix}
-\]
+$$
 
 This kernel is then normalized by dividing each element by the sum of all elements (273 in this case), resulting in:
 
-\[
+$$
 \begin{bmatrix}
 0.004 & 0.015 & 0.026 & 0.015 & 0.004 \\
 0.015 & 0.058 & 0.095 & 0.058 & 0.015 \\
@@ -38,7 +38,7 @@ This kernel is then normalized by dividing each element by the sum of all elemen
 0.015 & 0.058 & 0.095 & 0.058 & 0.015 \\
 0.004 & 0.015 & 0.026 & 0.015 & 0.004
 \end{bmatrix}
-\]
+$$
 
 ### 2. Gradient Calculation
 
@@ -48,22 +48,22 @@ After smoothing, the next step is to find the intensity gradient of the image. T
 
 The Sobel operator uses two \(3 \times 3\) kernels which are convolved with the image to compute the gradients in the x and y directions.
 
-\[
+$$
 G_x =
 \begin{bmatrix}
 -1 & 0 & 1 \\
 -2 & 0 & 2 \\
 -1 & 0 & 1
 \end{bmatrix}
-\]
-\[
+$$
+$$
 G_y =
 \begin{bmatrix}
 -1 & -2 & -1 \\
 0 & 0 & 0 \\
 1 & 2 & 1
 \end{bmatrix}
-\]
+$$
 
 For each pixel in the image, the gradients in the x (\(G_x\)) and y (\(G_y\)) directions are computed by convolving the image with these kernels.
 
@@ -71,17 +71,17 @@ For each pixel in the image, the gradients in the x (\(G_x\)) and y (\(G_y\)) di
 
 Consider a small section of the image:
 
-\[
+$$
 \begin{bmatrix}
 10 & 10 & 10 \\
 10 & 50 & 10 \\
 10 & 10 & 10
 \end{bmatrix}
-\]
+$$
 
 Applying the Sobel \(G_x\) kernel:
 
-\[
+$$
 G_x =
 \begin{bmatrix}
 -1 & 0 & 1 \\
@@ -95,11 +95,11 @@ G_x =
 10 & 10 & 10
 \end{bmatrix}
 = (-10 + 10 + 50 - 50 + 10 - 10) = 0
-\]
+$$
 
 Applying the Sobel \(G_y\) kernel:
 
-\[
+$$
 G_y =
 \begin{bmatrix}
 -1 & -2 & -1 \\
@@ -113,12 +113,12 @@ G_y =
 10 & 10 & 10
 \end{bmatrix}
 = (-10 - 20 - 10 + 10 + 20 + 10) = 0
-\]
+$$
 
 The gradient magnitude \(G\) and the gradient direction \(\theta\) are computed as follows:
 
-\[ G = \sqrt{G_x^2 + G_y^2} = \sqrt{0^2 + 0^2} = 0 \]
-\[ \theta = \arctan\left(\frac{G_y}{G_x}\right) = \arctan\left(\frac{0}{0}\right) = 0 \]
+$$ G = \sqrt{G_x^2 + G_y^2} = \sqrt{0^2 + 0^2} = 0 $$
+$$ \theta = \arctan\left(\frac{G_y}{G_x}\right) = \arctan\left(\frac{0}{0}\right) = 0 $$
 
 ### 3. Non-Maximum Suppression
 
@@ -128,13 +128,13 @@ Non-maximum suppression is applied to thin the edges. This step involves scannin
 
 Consider the gradient magnitude matrix:
 
-\[
+$$
 \begin{bmatrix}
 0 & 0 & 0 \\
 0 & 100 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
-\]
+$$
 
 Here, the central pixel (100) is compared with its neighbors in the gradient direction. If it is the maximum, it is kept; otherwise, it is suppressed.
 
@@ -148,13 +148,13 @@ The edge pixels are classified into strong, weak, and non-relevant pixels using 
 
 For example, if \(T_h = 75\) and \(T_l = 25\):
 
-\[
+$$
 \begin{bmatrix}
 0 & 0 & 0 \\
 0 & 100 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
-\]
+$$
 
 The pixel with 100 is a strong pixel (since 100 > 75), and the others are non-relevant.
 
@@ -166,13 +166,13 @@ Finally, edge tracking by hysteresis is used to determine the final edges. Stron
 
 Using the previous classification:
 
-\[
+$$
 \begin{bmatrix}
 0 & 0 & 0 \\
 0 & 100 & 0 \\
 0 & 0 & 0
 \end{bmatrix}
-\]
+$$
 
 Only the central pixel (100) remains as an edge.
 
@@ -246,15 +246,15 @@ This header file, `cuda_kernel.h`, contains CUDA kernels for various image proce
 ### 1. `colorToBW` Kernel
 
 Converts a color image to grayscale. Each pixel in the input color image (in RGB format) is processed independently by a thread. The kernel calculates the grayscale value using the standard luminance conversion formula, which is a weighted sum of the red, green, and blue components:
-\[ \text{Grayscale} = 0.299 \times R + 0.587 \times G + 0.114 \times B \]
+$$ \text{Grayscale} = 0.299 \times R + 0.587 \times G + 0.114 \times B $$
 This grayscale value is then stored in the output image.
 
 ### 2. `SobelOperator` Kernel
 
 Applies the Sobel operator to a grayscale image to calculate the gradient magnitude and direction at each pixel. The Sobel operator detects edges by computing the horizontal (Gx) and vertical (Gy) gradients using convolution with Sobel kernels. The gradient magnitude (G) is then calculated as:
-\[ G = \sqrt{Gx^2 + Gy^2} \]
+$$ G = \sqrt{Gx^2 + Gy^2} $$
 The gradient direction (\(\theta\)) is computed using:
-\[ \theta = \arctan\left(\frac{Gy}{Gx}\right) \]
+$$ \theta = \arctan\left(\frac{Gy}{Gx}\right) $$
 The results are stored in the gradient and direction arrays.
 
 ### 3. `DoubleThresholdHysteresis` Kernel
