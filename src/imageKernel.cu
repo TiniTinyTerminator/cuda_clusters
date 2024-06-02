@@ -1,8 +1,3 @@
-/**
- * @file cuda_kernel.h
- * @brief CUDA kernels for image processing operations.
- */
-
 #include "cuda_kernel.h"
 #include <cuda_runtime.h>
 #include "helper_cuda.h"
@@ -18,7 +13,7 @@
  * @param kernel Pointer to the Gaussian kernel.
  * @param kernel_size Size of the Gaussian kernel (assumed to be square).
  */
-__global__ void gaussian_filter(const unsigned char* input, unsigned char* output, int width, int height, const float* kernel, int kernel_size) {
+__global__ void GaussianFilter(const unsigned char* input, unsigned char* output, int width, int height, const float* kernel, int kernel_size) {
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
     int half_k = kernel_size / 2;
@@ -280,7 +275,7 @@ cv::Mat1b apply_gaussian_filter(const cv::Mat1b &input, const int kernel_size, c
     dim3 gridDim((width + blockDim.x - 1) / blockDim.x, (height + blockDim.y - 1) / blockDim.y);
 
     // Launch the Gaussian filter kernel
-    gaussian_filter<<<gridDim, blockDim>>>(d_input, d_output, width, height, d_kernel, kernel_size);
+    GaussianFilter<<<gridDim, blockDim>>>(d_input, d_output, width, height, d_kernel, kernel_size);
 
     // Synchronize and check for errors
     cudaDeviceSynchronize();
@@ -294,7 +289,7 @@ cv::Mat1b apply_gaussian_filter(const cv::Mat1b &input, const int kernel_size, c
 
     // Create an output image
     cv::Mat1b output(size);
-    output.setTo(cv::Scalar(0));
+    // output.setTo(cv::Scalar(0));
 
     // Copy the result back to the host
     cudaMemcpy(output.data, d_output, width * height * sizeof(unsigned char), cudaMemcpyDeviceToHost);
@@ -346,7 +341,7 @@ cv::Mat1b convert_color_to_bw(const cv::Mat3b &input)
 
     // Create an output image
     cv::Mat1b output(size);
-    output.setTo(cv::Scalar(0));
+    // output.setTo(cv::Scalar(0));
 
     // Copy the result back to the host
     cudaMemcpy((void *)output.data, cuda_out, n_pixels, cudaMemcpyDeviceToHost);
@@ -413,7 +408,7 @@ cv::Mat1b canny_edge_detection(const cv::Mat1b &input, unsigned char low_thresh,
 
     // Create an output image
     cv::Mat1b output(size);
-    output.setTo(cv::Scalar(0));
+    // output.setTo(cv::Scalar(0));
 
     // Copy the result back to the host
     cudaMemcpy(output.data, cuda_nms, size_gray, cudaMemcpyDeviceToHost);

@@ -15,7 +15,7 @@ set(LIB "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(CUDA_SAMPLES_INC "${LIB}/cuda-samples/Common")
 set(ARGPARSE_INC "${LIB}/argparse/include")
 
-add_library(cuda_kernel ${SRC}/imageKernel.cu ${SRC}/clusteringKernel.cu ${SRC}/extra.cpp)
+add_library(cuda_kernel ${SRC}/imageKernel.cu ${SRC}/clusteringKernel.cu ${SRC}/extra.cu)
 target_include_directories(cuda_kernel PUBLIC ${CUDA_SAMPLES_INC} ${INC} ${CUDA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 set_property(TARGET cuda_kernel PROPERTY CUDA_ARCHITECTURES 70-real 72-virtual)
 

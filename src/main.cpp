@@ -3,6 +3,7 @@
 #include <chrono>
 #include <filesystem>
 #include <string>
+#include <algorithm>
 
 #include <argparse/argparse.hpp>
 #include <opencv2/opencv.hpp>
@@ -11,6 +12,16 @@
 
 using namespace std::chrono_literals;
 
+// Define a list of colors using cv::Scalar
+std::vector<cv::Scalar> colors = {
+    cv::Scalar(255, 0, 0),    // Blue
+    cv::Scalar(0, 255, 0),    // Green
+    cv::Scalar(0, 0, 255),    // Red
+    cv::Scalar(255, 255, 0),  // Cyan
+    cv::Scalar(255, 0, 255),  // Magenta
+    cv::Scalar(0, 255, 255),  // Yellow
+    cv::Scalar(255, 255, 255) // White
+};
 
 int main(int argc, char const *argv[])
 {
@@ -26,7 +37,7 @@ int main(int argc, char const *argv[])
 
     program.add_argument("--min-cluster-size")
         .help("Minimum size of the cluster (contour) to be processed")
-        .default_value(20)
+        .default_value(10)
         .scan<'i', int>();
 
     try {
@@ -60,21 +71,24 @@ int main(int argc, char const *argv[])
         cv::Mat1b canny_image = canny_edge_detection(blurred_image, 10, 50);
         std::vector<int> labels = label_components(canny_image);
         auto contours = extract_contours(labels, canny_image.cols, canny_image.rows);
+        
+        cv::Mat3b output(canny_image.size());
+        output.setTo(cv::Scalar(0,0,0));
 
-        cv::Mat1b filtered_image(canny_image.size());
-        filtered_image.setTo(cv::Scalar(0));
-
-        for (const auto &contour : contours)
+        for (size_t i = 0; i < contours.size(); i++)
         {
+            std::vector<IntPoint_t> &contour = contours[i];
+
             if (contour.size() < min_cluster_size)
                 continue;
-            scale_and_map_points(contour, filtered_image);
+
+            output += scale_and_map_points(contour, colors[i % colors.size()], output.size());
         }
 
         cv::imwrite(output_dir + "/bw_image.png", bw_image);
         cv::imwrite(output_dir + "/blurred_image.png", blurred_image);
         cv::imwrite(output_dir + "/canny_image.png", canny_image);
-        cv::imwrite(output_dir + "/filtered_image.png", filtered_image);
+        cv::imwrite(output_dir + "/filtered_image.png", output);
     }
     else
     {
@@ -102,20 +116,23 @@ int main(int argc, char const *argv[])
             std::vector<int> labels = label_components(canny_image);
             auto contours = extract_contours(labels, canny_image.cols, canny_image.rows);
 
-            cv::Mat1b filtered_image(canny_image.size());
-            filtered_image.setTo(cv::Scalar(0));
+            cv::Mat3b output(canny_image.size());
+            output.setTo(cv::Scalar(0,0,0));
 
-            for (const auto &contour : contours)
+            for (size_t i = 0; i < contours.size(); i++)
             {
+                std::vector<IntPoint_t> &contour = contours[i];
+
                 if (contour.size() < min_cluster_size)
                     continue;
-                scale_and_map_points(contour, filtered_image);
+
+                output += scale_and_map_points(contour, colors[i % colors.size()], output.size());
             }
 
             cv::imshow("bw", bw_image);
             cv::imshow("blurred image", blurred_image);
             cv::imshow("canny image", canny_image);
-            cv::imshow("removed small clusters", filtered_image);
+            cv::imshow("removed small and colored clusters", output);
 
             int key = cv::waitKey(1);
             if (key == 'c')

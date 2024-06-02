@@ -1,9 +1,5 @@
-/**
- * @file cuda_kernel.h
- * @brief CUDA kernels for image processing operations, including labeling, boundary detection, and path interpolation.
- */
-
 #include "cuda_kernel.h"
+
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 #include <helper_cuda.h>
@@ -65,7 +61,7 @@ __global__ void LabelPropagation(int *labels, size_t width, size_t height)
 
     // Calculate the 1D index of the pixel
     int idx = y * width + x;
-    int label = labels[idx];
+    int &label = labels[idx];
 
     // If the label is -1 (background), do nothing
     if (label == -1)
@@ -91,7 +87,7 @@ __global__ void LabelPropagation(int *labels, size_t width, size_t height)
     }
 
     // Update the label of the current pixel
-    labels[idx] = new_label;
+    label = new_label;
 }
 
 /**
@@ -134,25 +130,24 @@ __global__ void FlattenLabels(int *labels, size_t width, size_t height)
  * @param lengths Pointer to output lengths array.
  * @param path_size Size of the path.
  */
-__global__ void CalculateSegmentLengthsKernel(const IntPoint_t *path, double *lengths, size_t path_size)
+__global__ void CalculateSegmentLengths(const IntPoint_t *path, double *lengths, size_t path_size)
 {
     // Calculate the index of the current point this thread is responsible for
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     // If the current point is within the path (excluding the last point)
-    if (i < path_size - 1)
+    if (idx < path_size - 1)
     {
         // Calculate the length between consecutive points
-        lengths[i] = DeviceHypot(path[i + 1].x - path[i].x, path[i + 1].y - path[i].y);
+        lengths[idx] = DeviceHypot(path[idx + 1].x - path[idx].x, path[idx + 1].y - path[idx].y);
     }
     // If the current point is the last point in the path
-    else if (i == path_size - 1)
+    else if (idx == path_size - 1)
     {
         // Last segment has no length
-        lengths[i] = 0.0;
+        lengths[idx] = 0.0;
     }
 }
-
 
 /**
  * @brief CUDA kernel to identify boundary pixels in a labeled image.
