@@ -2,10 +2,9 @@
 #include <cuda_runtime.h>
 #include "helper_cuda.h"
 
-
 /**
  * @brief CUDA kernel to apply a Gaussian filter to an image.
- * 
+ *
  * @param input Pointer to the input image data.
  * @param output Pointer to the output image data.
  * @param width Width of the image.
@@ -13,15 +12,19 @@
  * @param kernel Pointer to the Gaussian kernel.
  * @param kernel_size Size of the Gaussian kernel (assumed to be square).
  */
-__global__ void GaussianFilter(const unsigned char* input, unsigned char* output, int width, int height, const float* kernel, int kernel_size) {
+__global__ void GaussianFilter(const unsigned char *input, unsigned char *output, int width, int height, const float *kernel, int kernel_size)
+{
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
     int half_k = kernel_size / 2;
 
-    if (x < width && y < height) {
+    if (x < width && y < height)
+    {
         float sum = 0.0f;
-        for (int ky = -half_k; ky <= half_k; ++ky) {
-            for (int kx = -half_k; kx <= half_k; ++kx) {
+        for (int ky = -half_k; ky <= half_k; ++ky)
+        {
+            for (int kx = -half_k; kx <= half_k; ++kx)
+            {
                 int ix = min(max(x + kx, 0), width - 1);
                 int iy = min(max(y + ky, 0), height - 1);
                 sum += input[iy * width + ix] * kernel[(ky + half_k) * kernel_size + (kx + half_k)];
@@ -233,8 +236,8 @@ __global__ void NonMaxSuppression(float *gradient, float *direction, unsigned ch
         output[y * width + x] = 0;
 }
 
-
-cv::Mat1b apply_gaussian_filter(const cv::Mat1b &input, const int kernel_size, const float sigma) {
+cv::Mat1b apply_gaussian_filter(const cv::Mat1b &input, const int kernel_size, const float sigma)
+{
     const cv::Size size = input.size();
     const int width = size.width;
     const int height = size.height;
@@ -245,15 +248,18 @@ cv::Mat1b apply_gaussian_filter(const cv::Mat1b &input, const int kernel_size, c
     float sum = 0.0f;
 
     // Create Gaussian kernel
-    for (int y = -half_k; y <= half_k; ++y) {
-        for (int x = -half_k; x <= half_k; ++x) {
+    for (int y = -half_k; y <= half_k; ++y)
+    {
+        for (int x = -half_k; x <= half_k; ++x)
+        {
             float value = expf(-(x * x + y * y) / (2 * sigma * sigma));
             h_kernel[(y + half_k) * kernel_size + (x + half_k)] = value;
             sum += value;
         }
     }
 
-    for (int i = 0; i < kernel_size * kernel_size; ++i) {
+    for (int i = 0; i < kernel_size * kernel_size; ++i)
+    {
         h_kernel[i] /= sum;
     }
 
@@ -280,7 +286,8 @@ cv::Mat1b apply_gaussian_filter(const cv::Mat1b &input, const int kernel_size, c
     // Synchronize and check for errors
     cudaDeviceSynchronize();
     cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess) {
+    if (err != cudaSuccess)
+    {
         cudaFree(d_input);
         cudaFree(d_output);
         cudaFree(d_kernel);
@@ -352,7 +359,6 @@ cv::Mat1b convert_color_to_bw(const cv::Mat3b &input)
 
     return output;
 }
-
 
 cv::Mat1b canny_edge_detection(const cv::Mat1b &input, unsigned char low_thresh, unsigned char high_thresh)
 {
