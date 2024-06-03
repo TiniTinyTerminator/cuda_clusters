@@ -1,6 +1,10 @@
-# The Canny Edge Filter and Connected Component Labeling
+# Overview
 
-Edge detection is a fundamental task in image processing and computer vision, crucial for identifying object boundaries within images. The Canny Edge Filter is a widely used edge detection algorithm due to its ability to detect edges with optimal accuracy. This guide will walk you through the steps involved in the Canny Edge Filter, from noise reduction to edge tracking by hysteresis. Additionally, the nearest neighbour algorithm for finding clusters or connected components in a binary image will be implemented.
+This application processes an input image or a video stream from a camera using CUDA-accelerated image processing techniques. It includes functionalities such as converting color images to grayscale, applying Gaussian filters, performing Canny edge detection, labeling connected components, and extracting contours. Processed images are saved to a specified output directory.
+
+## The Canny Edge Filter and Connected Component Labeling
+
+Edge detection is a fundamental task in image processing and computer vision, crucial for identifying object boundaries within images. The Canny Edge Filter is a widely used edge detection algorithm due to its ability to detect edges with optimal accuracy. This application implements the Canny Edge Filter, guiding you through the steps involved, from noise reduction to edge tracking by hysteresis. Additionally, it uses the nearest neighbor algorithm to find clusters or connected components in a binary image, enabling the identification and labeling of distinct regions within the image.
 
 ## Prerequesties
 
@@ -8,6 +12,72 @@ Edge detection is a fundamental task in image processing and computer vision, cr
 2. cuda
 3. clang
 4. opencv (used for image/camera loading)
+5. argparse
+
+### loading git submodules
+
+2 extra git modules are loaded in which are used for arg parsing and error handling. To load these in, do the following:
+
+```sh
+git submodule update --init --recursive
+```
+
+## How to Use the Image Processing Application
+
+### Command-Line Arguments
+
+The application uses `argparse` to handle command-line arguments:
+
+- `-i`, `--image`: Path to the input image.
+- `-o`, `--output`: Directory to save the processed images. Defaults to the current directory.
+- `--min-cluster-size`: Minimum size of the cluster (contour) to be processed. Defaults to 10.
+
+### Steps to Use the Application
+
+#### Processing an Input Image
+
+1. **Run the application** with the path to an image:
+
+    ```sh
+    ./image_processor -i path/to/image.png -o output_directory --min-cluster-size 10
+    ```
+
+2. **Output Files**:
+    - `bw_image.png`: Grayscale version of the input image.
+    - `blurred_image.png`: Gaussian blurred image.
+    - `canny_image.png`: Image after Canny edge detection.
+    - `filtered_image.png`: Image with small clusters removed and remaining clusters colored.
+
+#### Processing a Video Stream from a Camera
+
+1. **Run the application** without specifying an image path:
+
+    ```sh
+    ./image_processor -o output_directory --min-cluster-size 10
+    ```
+
+2. **Real-Time Display**:
+    - `color`: Original camera feed.
+    - `bw`: Grayscale version of the camera feed.
+    - `blurred image`: Gaussian blurred camera feed.
+    - `canny image`: Camera feed after Canny edge detection.
+    - `removed small clusters and color clusters`: Processed feed with small clusters removed and remaining clusters colored.
+
+3. **Exit the application** by pressing the 'c' key.
+
+### Example Usage
+
+To process an image:
+
+```sh
+./image_processor -i sample_image.jpg -o ./results --min-cluster-size 15
+```
+
+### To process video from a camera
+
+```sh
+./image_processor --min-cluster-size 15
+```
 
 ## Steps of the Canny Edge Filter
 
@@ -242,11 +312,9 @@ Contours represent the outlines of each connected component.
 
 By following these steps, the algorithm effectively labels all connected components in a binary image, identifies their boundaries, and extracts their contours for further processing or analysis. This method is robust and ensures that all pixels in the same cluster are correctly labelled and that the boundaries are accurately defined.
 
-# Explanation of the CUDA Kernels for Image Processing Operations
+## Explanation of the implemented functions for Image Processing
 
 This header file, `cuda_kernel.h`, contains CUDA kernels for various image processing operations such as converting a color image to grayscale, applying the Sobel operator, performing double threshold hysteresis, tracking edges in hysteresis, performing non-maximum suppression, labeling connected components, detecting boundaries, and path interpolation.
-
-## Functions
 
 ### `map_and_color_points`
 
