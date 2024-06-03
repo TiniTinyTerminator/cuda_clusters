@@ -22,6 +22,10 @@ Edge detection is a fundamental task in image processing and computer vision, cr
 git submodule update --init --recursive
 ```
 
+## How to Build
+
+run ```bash ./run.sh```
+
 ## How to Use the Image Processing Application
 
 ### Command-Line Arguments
@@ -393,3 +397,8 @@ A CUDA kernel that identifies boundary pixels in a labeled image. It checks each
 ### `MapPoints`
 
 A CUDA kernel function designed to map points to an image with a specified color. It takes an array of points, an output image, the image's width and height, the number of points, and the color to be used. The function computes the index for each thread, checks if the index is out of bounds, and maps points to the image if they are within image bounds, coloring them accordingly.
+
+## Possible additions to code
+
+1. Implement Travelling Salesman Problem (TSP) solver to sort pixels of clusters from one end to the other
+2. Sort clusters based on size, length and position
