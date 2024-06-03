@@ -217,7 +217,7 @@ __global__ void IdentifyBoundaryPixels(const int *labels, BoundaryPixel *boundar
  * @param input The input binary image (cv::Mat1b).
  * @return std::vector<int> The labeled image as a flat vector.
  */
-std::vector<int> LabelComponents(const cv::Mat1b &input)
+std::vector<int> label_components(const cv::Mat1b &input)
 {
   int *cuda_labels;
   unsigned char *cuda_output;
@@ -282,7 +282,7 @@ std::vector<int> LabelComponents(const cv::Mat1b &input)
  * @param height Height of the image.
  * @return std::vector<std::vector<IntPoint_t>> The extracted contours.
  */
-std::vector<std::vector<IntPoint_t>> ExtractContours(const std::vector<int> &labels, size_t width, size_t height)
+std::vector<std::vector<IntPoint_t>> extract_contours(const std::vector<int> &labels, size_t width, size_t height)
 {
   // Allocate memory on the GPU
   int *d_labels;
