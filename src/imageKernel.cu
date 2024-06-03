@@ -56,7 +56,7 @@ __global__ void colorToBW(unsigned char *input, unsigned char *output, size_t wi
     int idx_in = y * width * 3 + x * 3;
 
     // Convert to grayscale using the standard luminance conversion formula
-    output[idx_out] = 0.299f * input[idx_in] + 0.587f * input[idx_in + 1] + 0.114f * input[idx_in + 2];
+    output[idx_out] = 0.299f * input[idx_in + 2] + 0.587f * input[idx_in + 1] + 0.114f * input[idx_in];
 }
 
 /**

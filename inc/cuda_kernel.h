@@ -7,6 +7,7 @@ template <class T>
 struct Point_t
 {
     T x, y;
+
 };
 
 typedef Point_t<int32_t> IntPoint_t;
@@ -84,4 +85,4 @@ std::vector<std::vector<IntPoint_t>> extract_contours(const std::vector<int> &la
  * 
  * @throws std::runtime_error If a CUDA error occurs.
  */
-cv::Mat3b scale_and_map_points(const std::vector<IntPoint_t> &points, cv::Scalar color, cv::Size size);
+cv::Mat3b map_and_color_points(const std::vector<IntPoint_t> &points, cv::Scalar color, cv::Size size);

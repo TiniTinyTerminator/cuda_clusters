@@ -23,6 +23,18 @@ std::vector<cv::Scalar> colors = {
     cv::Scalar(255, 255, 255) // White
 };
 
+std::ostream& operator<<(std::ostream& os, const cv::Scalar& scalar) {
+    os << "(";
+    for (int i = 0; i < 4; ++i) {
+        os << scalar[i];
+        if (i < 3) {
+            os << ", ";
+        }
+    }
+    os << ")";
+    return os;
+}
+
 int main(int argc, char const *argv[])
 {
     argparse::ArgumentParser program("image_processor");
@@ -40,9 +52,12 @@ int main(int argc, char const *argv[])
         .default_value(10)
         .scan<'i', int>();
 
-    try {
+    try
+    {
         program.parse_args(argc, argv);
-    } catch (const std::runtime_error& err) {
+    }
+    catch (const std::runtime_error &err)
+    {
         std::cerr << err.what() << std::endl;
         std::cerr << program;
         return -1;
@@ -71,9 +86,11 @@ int main(int argc, char const *argv[])
         cv::Mat1b canny_image = canny_edge_detection(blurred_image, 10, 50);
         std::vector<int> labels = label_components(canny_image);
         auto contours = extract_contours(labels, canny_image.cols, canny_image.rows);
-        
+
         cv::Mat3b output(canny_image.size());
-        output.setTo(cv::Scalar(0,0,0));
+        output.setTo(cv::Scalar(0, 0, 0));
+
+        int j = 0;
 
         for (size_t i = 0; i < contours.size(); i++)
         {
@@ -82,7 +99,10 @@ int main(int argc, char const *argv[])
             if (contour.size() < min_cluster_size)
                 continue;
 
-            output += scale_and_map_points(contour, colors[i % colors.size()], output.size());
+            output += map_and_color_points(contour, colors[j++ % colors.size()], output.size());
+
+            std::cout << contour.size() << colors[j % colors.size()] << std::endl;
+
         }
 
         cv::imwrite(output_dir + "/bw_image.png", bw_image);
@@ -108,8 +128,6 @@ int main(int argc, char const *argv[])
                 return -1;
             }
 
-            cv::imshow("color", image);
-
             cv::Mat1b bw_image = convert_color_to_bw(image);
             cv::Mat1b blurred_image = apply_gaussian_filter(bw_image, 5, 1);
             cv::Mat1b canny_image = canny_edge_detection(blurred_image, 10, 50);
@@ -117,7 +135,9 @@ int main(int argc, char const *argv[])
             auto contours = extract_contours(labels, canny_image.cols, canny_image.rows);
 
             cv::Mat3b output(canny_image.size());
-            output.setTo(cv::Scalar(0,0,0));
+            output.setTo(cv::Scalar(0, 0, 0));
+
+            int j = 0;
 
             for (size_t i = 0; i < contours.size(); i++)
             {
@@ -126,13 +146,14 @@ int main(int argc, char const *argv[])
                 if (contour.size() < min_cluster_size)
                     continue;
 
-                output += scale_and_map_points(contour, colors[i % colors.size()], output.size());
+                output += map_and_color_points(contour, colors[j++ % colors.size()], output.size());
             }
 
+            cv::imshow("color", image);
             cv::imshow("bw", bw_image);
             cv::imshow("blurred image", blurred_image);
             cv::imshow("canny image", canny_image);
-            cv::imshow("removed small and colored clusters", output);
+            cv::imshow("removed small clusters and color clusters", output);
 
             int key = cv::waitKey(1);
             if (key == 'c')

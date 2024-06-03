@@ -4,7 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 
-// Structure to hold RGB color values, packed to save memory space
+// Structure to hold RGB color values, packed preserve memory alignment
 struct __attribute__((packed)) color_t {
     char r, g, b; ///< Red, Green, and Blue color channels
 };
@@ -37,7 +37,7 @@ __global__ void MapPoints(const IntPoint_t *points, color_t *image, uint32_t w, 
 }
 
 /**
- * @brief Scales points and maps them to an image with a specified color.
+ * @brief Maps points to an image with a specified color.
  * 
  * @param points A vector of points to be mapped.
  * @param color The color used for mapping points (in BGR order).
@@ -46,7 +46,7 @@ __global__ void MapPoints(const IntPoint_t *points, color_t *image, uint32_t w, 
  * 
  * @throws std::runtime_error If a CUDA error occurs.
  */
-cv::Mat3b scale_and_map_points(const std::vector<IntPoint_t> &points, cv::Scalar color, cv::Size size) {
+cv::Mat3b map_and_color_points(const std::vector<IntPoint_t> &points, cv::Scalar color, cv::Size size) {
     IntPoint_t *points_d; ///< Device pointer for points
     color_t *color_image; ///< Device pointer for the color image
     
